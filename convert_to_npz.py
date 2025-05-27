@@ -148,7 +148,7 @@ def construct_npz(save_path, img_path, seg_path, synth_seg_path, age, disease_co
     - synth_seg_path: Path to the synthseg segmentation (.nii.gz).
     - age: Float representing the subject's age.
     - disease_condition: Integer representing diagnosis (e.g., 0 for HC, 1 for AD).
-    - uppoint: Starting coordinates for cropping.
+    - uppoint: Starting coordinates for cropping (the default uppoint assumes input sizes are 256x256x256).
     - out_size: Output size for cropped image.
     - show: Whether to show cropped slices for visual inspection.
     """
@@ -160,18 +160,24 @@ def construct_npz(save_path, img_path, seg_path, synth_seg_path, age, disease_co
     img = sitk.ReadImage(img_path, sitk.sitkFloat32)
     img = rescale(img)
     np_img = sitk.GetArrayFromImage(img)
+    print(np_img.shape)
 
     # Load segmentations
     seg = sitk.ReadImage(seg_path, sitk.sitkInt16)
     np_seg = sitk.GetArrayFromImage(seg)
+    print(np_seg.shape)
 
     synth_seg = sitk.ReadImage(synth_seg_path, sitk.sitkInt16)
     np_synth = sitk.GetArrayFromImage(synth_seg)
+    print(np_synth.shape)
 
     # Crop all arrays
     np_img = crop_ndarray(np_img, uppoint=uppoint, out_size=out_size, show=show)
     np_seg = crop_ndarray(np_seg, uppoint=uppoint, out_size=out_size, show=show)
     np_synth = crop_ndarray(np_synth, uppoint=uppoint, out_size=out_size, show=show)
+    print(np_img.shape)
+    print(np_seg.shape)
+    print(np_synth.shape)
 
     # Save to compressed npz
     np.savez_compressed(
@@ -197,7 +203,7 @@ if __name__ == "__main__":
     synth_seg_path = "./example/OAS30001_d0129_SynthSeg.nii.gz"
 
     # Output path to save the .npz file
-    save_path = "./example/OAS30001_d0129.npz"
+    save_path = "./example/OAS30001_d0129_saved.npz"
 
     # Metadata: Age of the subject. => CHANGE THIS TO REAL AGE! <=
     age = 65.54792466
